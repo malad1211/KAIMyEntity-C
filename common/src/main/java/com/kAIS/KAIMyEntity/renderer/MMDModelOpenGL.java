@@ -289,10 +289,23 @@ public class MMDModelOpenGL implements IMMDModel {
         light0Direction.rotate(new Quaternionf().rotateY(entityYaw*((float)Math.PI / 180F)));
         light1Direction.rotate(new Quaternionf().rotateY(entityYaw*((float)Math.PI / 180F)));
 
+        PoseStack temp = new PoseStack();
+        temp.setIdentity();
+        temp.mulPose(new Quaternionf().rotateX(MCinstance.gameRenderer.getMainCamera().getXRot()*((float)Math.PI / 180F)));
+        temp.mulPose(new Quaternionf().rotateY(MCinstance.gameRenderer.getMainCamera().getYRot()*((float)Math.PI / 180F)));
+        temp.mulPose(new Quaternionf().rotateY(180.0f*((float)Math.PI / 180F)));
+        
+
         deliverStack.mulPose(new Quaternionf().rotateY(-entityYaw*((float)Math.PI / 180F)));
         deliverStack.mulPose(new Quaternionf().rotateX(entityPitch*((float)Math.PI / 180F)));
         deliverStack.translate(entityTrans.x, entityTrans.y, entityTrans.z);
         deliverStack.scale(0.09f, 0.09f, 0.09f);
+
+        temp.mulPose(deliverStack.last().pose());
+
+        if(!(KAIMyEntityClient.calledFrom(8).contains("InventoryScreen") || KAIMyEntityClient.calledFrom(8).contains("class_490"))){
+            deliverStack = temp;
+        }
         
         if(KAIMyEntityClient.usingMMDShader == 0){
             shaderProgram = RenderSystem.getShader().getId();
