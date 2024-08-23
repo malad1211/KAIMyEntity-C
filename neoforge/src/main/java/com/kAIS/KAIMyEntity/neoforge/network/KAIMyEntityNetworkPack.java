@@ -4,51 +4,46 @@ import com.kAIS.KAIMyEntity.renderer.KAIMyEntityRendererPlayerHelper;
 import com.kAIS.KAIMyEntity.renderer.MMDModelManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class KAIMyEntityNetworkPack implements CustomPacketPayload{
+public record KAIMyEntityNetworkPack(int opCode, String playerUUIDString, int arg0) implements CustomPacketPayload{
     public static final Logger logger = LogManager.getLogger();
-    public static ResourceLocation id = new ResourceLocation("kaimyentity", "networkpack");
-    public int opCode;
-    public UUID playerUUID;
-    public int arg0;
+    public static final CustomPacketPayload.Type<KAIMyEntityNetworkPack> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("kaimyentity", "networkpack"));
+    public static final StreamCodec<ByteBuf, KAIMyEntityNetworkPack> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.VAR_INT,
+        KAIMyEntityNetworkPack::opCode,
+        ByteBufCodecs.STRING_UTF8,
+        KAIMyEntityNetworkPack::playerUUIDString,
+        ByteBufCodecs.VAR_INT,
+        KAIMyEntityNetworkPack::arg0,
+        KAIMyEntityNetworkPack::new
+    );
 
-    public KAIMyEntityNetworkPack(int opCode, UUID playerUUID, int arg0) {
-        this.opCode = opCode;
-        this.playerUUID = playerUUID;
-        this.arg0 = arg0;
-    }
-
-    public KAIMyEntityNetworkPack(FriendlyByteBuf buffer) {
-        opCode = buffer.readInt();
-        playerUUID = new UUID(buffer.readLong(), buffer.readLong());
-        arg0 = buffer.readInt();
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buffer){
-        buffer.writeInt(opCode);
-        buffer.writeLong(playerUUID.getMostSignificantBits());
-        buffer.writeLong(playerUUID.getLeastSignificantBits());
-        buffer.writeInt(arg0);
+    public KAIMyEntityNetworkPack(int opCode, UUID uuid, int arg){
+        this(opCode, uuid.toString(), arg);
     }
 
     @Override
-    public ResourceLocation id(){
-        return id;
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public void DoInClient() {
+    public static void DoInClient(KAIMyEntityNetworkPack pack, IPayloadContext context) {
         Minecraft MCinstance = Minecraft.getInstance();
+        UUID playerUUID = UUID.fromString(pack.playerUUIDString);
         //Ignore message when player is self.
         assert MCinstance.player != null;
         assert MCinstance.level != null;
@@ -59,12 +54,12 @@ public class KAIMyEntityNetworkPack implements CustomPacketPayload{
             logger.warn("received an invalid UUID.");
             return;
         }
-        switch (opCode) {
+        switch (pack.opCode) {
             case 1: {
                 RenderSystem.recordRenderCall(()->{
                 MMDModelManager.Model m = MMDModelManager.GetModel("EntityPlayer_" + targetPlayer.getName().getString());
                 if (m != null)
-                    KAIMyEntityRendererPlayerHelper.CustomAnim(targetPlayer, Integer.toString(arg0));
+                    KAIMyEntityRendererPlayerHelper.CustomAnim(targetPlayer, Integer.toString(pack.arg0));
                 });
                 break;
             }
@@ -79,7 +74,7 @@ public class KAIMyEntityNetworkPack implements CustomPacketPayload{
         }
     }
 
-    public void DoInServer(){
-        PacketDistributor.ALL.noArg().send(this);
+    public static void DoInServer(KAIMyEntityNetworkPack pack, IPayloadContext context){
+        PacketDistributor.sendToAllPlayers(pack);
     }
 }

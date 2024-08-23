@@ -1,22 +1,37 @@
 package com.kAIS.KAIMyEntity.fabric.network;
 
-import com.kAIS.KAIMyEntity.fabric.register.KAIMyEntityRegisterCommon;
 import com.kAIS.KAIMyEntity.renderer.KAIMyEntityRendererPlayerHelper;
 import com.kAIS.KAIMyEntity.renderer.MMDModelManager;
+
+import io.netty.buffer.ByteBuf;
+
 import java.util.UUID;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
-public class KAIMyEntityNetworkPack {
+public record KAIMyEntityNetworkPack(int opCode, String playerUUIDString, int arg0) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<KAIMyEntityNetworkPack> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("kaimyentity", "networkpack"));
+    public static final StreamCodec<ByteBuf, KAIMyEntityNetworkPack> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.VAR_INT,
+        KAIMyEntityNetworkPack::opCode,
+        ByteBufCodecs.STRING_UTF8,
+        KAIMyEntityNetworkPack::playerUUIDString,
+        ByteBufCodecs.VAR_INT,
+        KAIMyEntityNetworkPack::arg0,
+        KAIMyEntityNetworkPack::new
+    );
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
     public static void sendToServer(int opCode, UUID playerUUID, int arg0){
-        FriendlyByteBuf buffer = PacketByteBufs.create();
-        buffer.writeInt(opCode);
-        buffer.writeUUID(playerUUID);
-        buffer.writeInt(arg0);
-        ClientPlayNetworking.send(KAIMyEntityRegisterCommon.KAIMYENTITY_C2S, buffer);
+        ClientPlayNetworking.send(new KAIMyEntityNetworkPack(opCode, playerUUID.toString(), arg0));
     }
     
     public static void DoInClient(FriendlyByteBuf buffer){

@@ -22,7 +22,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +30,7 @@ import org.lwjgl.glfw.GLFW;
 //import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class KAIMyEntityRegisterClient {
     static final Logger logger = LogManager.getLogger();
     static KeyMapping keyCustomAnim1 = new KeyMapping("key.customAnim1", KeyConflictContext.IN_GAME, KeyModifier.NONE, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.title");
@@ -78,7 +78,8 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, "1");
                 assert localPlayer != null;
-                PacketDistributor.SERVER.noArg().send(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 1));
+                //PacketDistributor.SERVER.noArg().send(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 1));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 1));
             }
         }
         if (keyCustomAnim2.isDown()) {
@@ -86,7 +87,7 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, "2");
                 assert localPlayer != null;
-                PacketDistributor.SERVER.noArg().send(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 2));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 2));
             }
         }
         if (keyCustomAnim3.isDown()) {
@@ -94,7 +95,7 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, "3");
                 assert localPlayer != null;
-                PacketDistributor.SERVER.noArg().send(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 3));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 3));
             }
         }
         if (keyCustomAnim4.isDown()) {
@@ -102,7 +103,7 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, "4");
                 assert localPlayer != null;
-                PacketDistributor.SERVER.noArg().send(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 4));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 4));
             }
         }
         if (keyReloadModels.isDown()) {
@@ -113,7 +114,7 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.ResetPhysics(localPlayer);
                 assert localPlayer != null;
-                PacketDistributor.SERVER.noArg().send(new KAIMyEntityNetworkPack(2, localPlayer.getUUID(), 0));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(2, localPlayer.getUUID(), 0));
             }
         }
         if (keyReloadProperties.isDown()) {

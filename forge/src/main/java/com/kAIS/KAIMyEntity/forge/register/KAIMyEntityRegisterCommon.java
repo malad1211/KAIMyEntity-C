@@ -10,7 +10,7 @@ public class KAIMyEntityRegisterCommon {
     static String networkVersion = "1";
 
     public static void Register() {
-        channel = ChannelBuilder.named(new ResourceLocation("kaimyentity", "network_pack")).networkProtocolVersion(1).optional().simpleChannel();
+        channel = ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath("kaimyentity", "network_pack")).networkProtocolVersion(1).optional().simpleChannel();
         channel.messageBuilder(KAIMyEntityNetworkPack.class).encoder(KAIMyEntityNetworkPack::Pack).decoder(KAIMyEntityNetworkPack::new).consumerMainThread(KAIMyEntityNetworkPack::Do).add();
     }
 }

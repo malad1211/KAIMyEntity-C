@@ -95,11 +95,11 @@ public class KAIMyEntityRegisterClient {
             }
         }
 
-        ClientPlayNetworking.registerGlobalReceiver(KAIMyEntityRegisterCommon.KAIMYENTITY_S2C, (client, handler, buf, responseSender) -> {
-            int opCode = buf.readInt();
-            UUID playerUUID = buf.readUUID();
-            int arg0 = buf.readInt();
-            client.execute(() -> {
+        ClientPlayNetworking.registerGlobalReceiver(KAIMyEntityNetworkPack.TYPE, (payload, context) -> {
+            int opCode = payload.opCode();
+            UUID playerUUID = UUID.fromString(payload.playerUUIDString());
+            int arg0 = payload.arg0();
+            context.client().execute(() -> {
                 KAIMyEntityNetworkPack.DoInClient(opCode, playerUUID, arg0);
             });
         });
