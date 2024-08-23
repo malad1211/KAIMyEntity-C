@@ -6,11 +6,11 @@ import com.kAIS.KAIMyEntity.fabric.network.KAIMyEntityNetworkPack;
 import com.kAIS.KAIMyEntity.renderer.KAIMyEntityRenderFactory;
 import com.kAIS.KAIMyEntity.renderer.KAIMyEntityRendererPlayerHelper;
 import com.kAIS.KAIMyEntity.renderer.MMDModelManager;
+import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import java.io.File;
-import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -97,10 +97,10 @@ public class KAIMyEntityRegisterClient {
 
         ClientPlayNetworking.registerGlobalReceiver(KAIMyEntityNetworkPack.TYPE, (payload, context) -> {
             int opCode = payload.opCode();
-            UUID playerUUID = UUID.fromString(payload.playerUUIDString());
-            int arg0 = payload.arg0();
+            GameProfile profile = payload.profile();
+            int customAnimId = payload.customAnimId();
             context.client().execute(() -> {
-                KAIMyEntityNetworkPack.DoInClient(opCode, playerUUID, arg0);
+                KAIMyEntityNetworkPack.DoInClient(opCode, profile, customAnimId);
             });
         });
 
@@ -120,7 +120,7 @@ public class KAIMyEntityRegisterClient {
     public static void onKeyResetPhysicsDown() {
         Minecraft MCinstance = Minecraft.getInstance();
         LocalPlayer localPlayer = MCinstance.player;
-        KAIMyEntityNetworkPack.sendToServer(2, localPlayer.getUUID(), 0);
+        KAIMyEntityNetworkPack.sendToServer(2, localPlayer.getGameProfile(), 0);
         RenderSystem.recordRenderCall(()->{
             KAIMyEntityRendererPlayerHelper.ResetPhysics(localPlayer);
         });
@@ -129,7 +129,7 @@ public class KAIMyEntityRegisterClient {
     public static void onCustomKeyDown(Integer numOfKey) {
         Minecraft MCinstance = Minecraft.getInstance();
         LocalPlayer localPlayer = MCinstance.player;
-        KAIMyEntityNetworkPack.sendToServer(1, localPlayer.getUUID(), numOfKey);
+        KAIMyEntityNetworkPack.sendToServer(1, localPlayer.getGameProfile(), numOfKey);
         RenderSystem.recordRenderCall(()->{
             KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, numOfKey.toString());
         });

@@ -79,7 +79,7 @@ public class KAIMyEntityRegisterClient {
                 KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, "1");
                 assert localPlayer != null;
                 //PacketDistributor.SERVER.noArg().send(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 1));
-                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 1));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getGameProfile(), 1));
             }
         }
         if (keyCustomAnim2.isDown()) {
@@ -87,7 +87,7 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, "2");
                 assert localPlayer != null;
-                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 2));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getGameProfile(), 2));
             }
         }
         if (keyCustomAnim3.isDown()) {
@@ -95,7 +95,7 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, "3");
                 assert localPlayer != null;
-                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 3));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getGameProfile(), 3));
             }
         }
         if (keyCustomAnim4.isDown()) {
@@ -103,7 +103,7 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.CustomAnim(localPlayer, "4");
                 assert localPlayer != null;
-                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getUUID(), 4));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(1, localPlayer.getGameProfile(), 4));
             }
         }
         if (keyReloadModels.isDown()) {
@@ -114,7 +114,7 @@ public class KAIMyEntityRegisterClient {
             if (m != null) {
                 KAIMyEntityRendererPlayerHelper.ResetPhysics(localPlayer);
                 assert localPlayer != null;
-                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(2, localPlayer.getUUID(), 0));
+                PacketDistributor.sendToServer(new KAIMyEntityNetworkPack(2, localPlayer.getGameProfile(), 0));
             }
         }
         if (keyReloadProperties.isDown()) {

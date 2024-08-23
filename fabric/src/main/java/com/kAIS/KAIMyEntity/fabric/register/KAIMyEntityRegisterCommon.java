@@ -15,7 +15,7 @@ public class KAIMyEntityRegisterCommon {
         ServerPlayNetworking.registerGlobalReceiver(KAIMyEntityNetworkPack.TYPE, (payload, context) -> {
             context.server().execute(() -> {
                 for(ServerPlayer serverPlayer : PlayerLookup.all(context.server())){
-                    if(!serverPlayer.getUUID().toString().equals(payload.playerUUIDString())){
+                    if(!serverPlayer.getGameProfile().equals(payload.profile())){
                         ServerPlayNetworking.send(serverPlayer, payload);
                     }
                 }
