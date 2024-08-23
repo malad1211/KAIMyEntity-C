@@ -3,6 +3,7 @@ package com.kAIS.KAIMyEntity;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -73,15 +74,15 @@ public class NativeFunc {
 
     private void DownloadRuntime() throws Exception {
         if (isWindows) {
-            DownloadSingleFile(new URL(urlMap.get(runtimeUrlRes.windows)), new File(gameDirectory, "KAIMyEntitySaba.dll"));
+            DownloadSingleFile(new URI(urlMap.get(runtimeUrlRes.windows)).toURL(), new File(gameDirectory, "KAIMyEntitySaba.dll"));
         }
         if (isLinux && !isAndroid) {
             logger.info("Not support!");
             throw new Error();
         }
         if (isLinux && isAndroid) {
-            DownloadSingleFile(new URL(urlMap.get(runtimeUrlRes.android_arch64_libc)), new File(RuntimePath, "libc++_shared.so"));
-            DownloadSingleFile(new URL(urlMap.get(runtimeUrlRes.android_arch64)), new File(RuntimePath, "KAIMyEntitySaba.so"));
+            DownloadSingleFile(new URI(urlMap.get(runtimeUrlRes.android_arch64_libc)).toURL(), new File(RuntimePath, "libc++_shared.so"));
+            DownloadSingleFile(new URI(urlMap.get(runtimeUrlRes.android_arch64)).toURL(), new File(RuntimePath, "KAIMyEntitySaba.so"));
         }
     }
 

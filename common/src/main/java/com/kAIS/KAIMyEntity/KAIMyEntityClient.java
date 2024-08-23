@@ -11,7 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import net.minecraft.client.Minecraft;
@@ -104,9 +105,11 @@ public class KAIMyEntityClient {
             logger.info("KAIMyEntity folder not found, try download from github!");
             KAIMyEntityFolder.mkdir();
             try{
-                FileUtils.copyURLToFile(new URL("https://github.com/Gengorou-C/KAIMyEntity-C/releases/download/requiredFiles/KAIMyEntity.zip"), new File(gameDirectory + "/KAIMyEntity.zip"), 30000, 30000);
+                FileUtils.copyURLToFile(new URI("https://github.com/Gengorou-C/KAIMyEntity-C/releases/download/requiredFiles/KAIMyEntity.zip").toURL(), new File(gameDirectory + "/KAIMyEntity.zip"), 30000, 30000);
             }catch (IOException e){
-                logger.info("Download KAIMyEntity.zip failed!");
+                logger.info("Download KAIMyEntity.zip failed! (IOException)");
+            }catch(URISyntaxException e){
+                logger.info("Download KAIMyEntity.zip failed! (URISyntaxException)");
             }
 
             try{
