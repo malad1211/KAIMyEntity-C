@@ -139,9 +139,10 @@ public class KAIMyEntityClient {
     
     public static void drawText(String arg, int x, int y){
         //MinecraftClient MCinstance = MinecraftClient.getInstance();
-        PoseStack mat;
+        PoseStack mat = new PoseStack();
+        mat.setIdentity();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        mat = RenderSystem.getModelViewStack();
+        mat.mulPose(RenderSystem.getModelViewMatrix());
         mat.pushPose();
         //instance.textRenderer.draw(mat, arg, x, y, -1);
         mat.popPose();
