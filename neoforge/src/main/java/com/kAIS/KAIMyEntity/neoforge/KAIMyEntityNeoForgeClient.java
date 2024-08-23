@@ -8,10 +8,10 @@ import com.kAIS.KAIMyEntity.renderer.MMDModelOpenGL;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD, modid = KAIMyEntity.MOD_ID)
+@EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = KAIMyEntity.MOD_ID)
 public class KAIMyEntityNeoForgeClient {
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
