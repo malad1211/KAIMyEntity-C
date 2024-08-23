@@ -154,7 +154,9 @@ public abstract class KAIMyEntityPlayerRendererMixin extends LivingEntityRendere
 
             if(KAIMyEntityClient.calledFrom(6).contains("InventoryScreen") || KAIMyEntityClient.calledFrom(6).contains("class_490")){ // net.minecraft.class_490 == net.minecraft.client.gui.screen.ingame.InventoryScreen
                 RenderSystem.setShader(GameRenderer::getPositionTexShader);
-                PoseStack PTS_modelViewStack = RenderSystem.getModelViewStack();
+                PoseStack PTS_modelViewStack = new PoseStack(); //[P]osition [T]ex [S]hader
+                PTS_modelViewStack.setIdentity();
+                PTS_modelViewStack.mulPose(RenderSystem.getModelViewMatrix());
                 PTS_modelViewStack.pushPose();
                 int PosX_in_inventory;
                 int PosY_in_inventory;
