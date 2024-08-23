@@ -18,8 +18,9 @@ import net.minecraft.client.Minecraft;
 
 public class MMDModelManager {
     static final Logger logger = LogManager.getLogger();
+    static final Minecraft MCinstance = Minecraft.getInstance();
     static Map<String, Model> models;
-    static String gameDirectory = Minecraft.getInstance().gameDirectory.getAbsolutePath();
+    static String gameDirectory = MCinstance.gameDirectory.getAbsolutePath();
 
     public static void Init() {
         models = new HashMap<>();

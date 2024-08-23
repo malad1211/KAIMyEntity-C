@@ -25,7 +25,8 @@ public class KAIMyEntityClient {
     public static final Logger logger = LogManager.getLogger();
     public static int usingMMDShader = 0;
     public static boolean reloadProperties = false;
-    static String gameDirectory = Minecraft.getInstance().gameDirectory.getAbsolutePath();
+    static final Minecraft MCinstance = Minecraft.getInstance();
+    static final String gameDirectory = MCinstance.gameDirectory.getAbsolutePath();
     static final int BUFFER = 512;
     static final long TOOBIG = 0x6400000; // Max size of unzipped data, 100MB
     static final int TOOMANY = 1024;      // Max number of files

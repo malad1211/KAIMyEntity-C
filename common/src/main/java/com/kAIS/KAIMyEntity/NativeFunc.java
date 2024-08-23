@@ -15,7 +15,8 @@ import org.apache.logging.log4j.Logger;
 public class NativeFunc {
     public static final Logger logger = LogManager.getLogger();
     private static final String RuntimePath = new File(System.getProperty("java.home")).getParent();
-    private static final String gameDirectory = Minecraft.getInstance().gameDirectory.getAbsolutePath();
+    private static final Minecraft MCinstance = Minecraft.getInstance();
+    private static final String gameDirectory = MCinstance.gameDirectory.getAbsolutePath();
     private static final boolean isAndroid = new File("/system/build.prop").exists();
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");

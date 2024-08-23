@@ -12,11 +12,12 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.client.Minecraft;
 
 public class MMDAnimManager {
-    public static final Logger logger = LogManager.getLogger();
+    static final Logger logger = LogManager.getLogger();
+    static final Minecraft MCinstance = Minecraft.getInstance();
     static NativeFunc nf;
     static Map<String, Long> animStatic;
     static Map<IMMDModel, Map<String, Long>> animModel;
-    static String defaultAnimDir = new File(Minecraft.getInstance().gameDirectory, "KAIMyEntity/DefaultAnim").getAbsolutePath();
+    static final String defaultAnimDir = new File(MCinstance.gameDirectory, "KAIMyEntity/DefaultAnim").getAbsolutePath();
 
     public static void Init() {
         nf = NativeFunc.GetInst();

@@ -8,11 +8,12 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL46C;
 
 public class ShaderProvider {
+    public static final Logger logger = LogManager.getLogger();
+    private static final Minecraft MCinstance = Minecraft.getInstance();
     private static boolean isInited = false;
     private static int program = 0;
-    private static final String vertexPath = Minecraft.getInstance().gameDirectory.getAbsolutePath() + "/KAIMyEntity/Shader/MMDShader.vsh";
-    private static final String fragPath = Minecraft.getInstance().gameDirectory.getAbsolutePath() + "/KAIMyEntity/Shader/MMDShader.fsh";
-    public static final Logger logger = LogManager.getLogger();
+    private static final String vertexPath = MCinstance.gameDirectory.getAbsolutePath() + "/KAIMyEntity/Shader/MMDShader.vsh";
+    private static final String fragPath = MCinstance.gameDirectory.getAbsolutePath() + "/KAIMyEntity/Shader/MMDShader.fsh";
 
     public static void Init() {
         if (!isInited) {
