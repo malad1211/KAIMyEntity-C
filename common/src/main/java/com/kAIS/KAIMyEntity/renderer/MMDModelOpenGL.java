@@ -303,7 +303,7 @@ public class MMDModelOpenGL implements IMMDModel {
 
         temp.mulPose(deliverStack.last().pose());
 
-        if(!(KAIMyEntityClient.calledFrom(8).contains("InventoryScreen") || KAIMyEntityClient.calledFrom(8).contains("class_490"))){
+        if(!(KAIMyEntityClient.calledFrom(8).contains("InventoryScreen") || KAIMyEntityClient.calledFrom(8).contains("class_490") || RenderSystem.getShader().getName().contains("shadow"))){
             deliverStack = temp;
         }
         
