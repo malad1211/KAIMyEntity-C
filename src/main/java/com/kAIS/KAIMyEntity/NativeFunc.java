@@ -88,11 +88,11 @@ public class NativeFunc
         try {
             if (isWindows) {
                 KAIMyEntity.logger.info("Win32 Env Detected!");
-                LoadLibrary(new File(Minecraft.getMinecraft().gameDir.getAbsolutePath(), "KAIMyEntitySaba.dll"));//WIN32
+                LoadLibrary(new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath(), "KAIMyEntitySaba.dll"));//WIN32
             }
             if (isLinux && !isAndroid) {
                 KAIMyEntity.logger.info("Linux Env Detected!");
-                LoadLibrary(new File(Minecraft.getMinecraft().gameDir.getAbsolutePath(), "KAIMyEntitySaba.so"));//Linux
+                LoadLibrary(new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath(), "KAIMyEntitySaba.so"));//Linux
             }
             if (isLinux && isAndroid) {
                 KAIMyEntity.logger.info("Android Env Detected!");

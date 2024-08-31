@@ -36,7 +36,7 @@ public class KAIMyEntityRegisterClient
         ClientRegistry.registerKeyBinding(keyCustomAnim3);
         ClientRegistry.registerKeyBinding(keyCustomAnim4);
 
-        File modelDir = new File(Minecraft.getMinecraft().gameDir, "KAIMyEntity");
+        File modelDir = new File(Minecraft.getMinecraft().mcDataDir, "KAIMyEntity");
         File[] allDir = modelDir.listFiles();
         if (allDir != null)
         {

@@ -21,7 +21,7 @@ public class MMDModelManager
     public static IMMDModel LoadModel(String modelName, long layerCount)
     {
         //Model path
-        File modelDir = new File(Minecraft.getMinecraft().gameDir, "KAIMyEntity/" + modelName);
+        File modelDir = new File(Minecraft.getMinecraft().mcDataDir, "KAIMyEntity/" + modelName);
         String modelDirStr = modelDir.getAbsolutePath();
 
         String modelFilenameStr;
