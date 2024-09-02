@@ -4,6 +4,7 @@ import com.kAIS.KAIMyEntity.NativeFunc;
 import com.kAIS.KAIMyEntity.config.KAIMyEntityConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -47,6 +48,14 @@ public class MMDModelManager
         }
 
         return MMDModelOpenGL.Create(modelFilenameStr, modelDirStr, isPMD, layerCount);
+    }
+
+    public static MMDModelManager.Model GetPlayerModelOrInPool(EntityPlayer entity) {
+        MMDModelManager.Model m = MMDModelManager.GetModelOrInPool(entity, "EntityPlayer_" + entity.getName(), true);
+        if (m == null) {
+            m = MMDModelManager.GetModelOrInPool(entity, "EntityPlayer", true);
+        }
+        return m;
     }
 
     public static MMDModelManager.Model GetModelOrInPool(Entity entity, String modelName, boolean isPlayer)
@@ -135,6 +144,11 @@ public class MMDModelManager
     public static void Update()
     {
         long deltaTime = System.currentTimeMillis() - prevTime;
+
+        // we don't need this running n times per tick
+        // for every entity rendered
+        if (deltaTime < 200) return;
+
         prevTime = System.currentTimeMillis();
 
         List<Entity> waitForDelete = new LinkedList<>();
@@ -172,7 +186,7 @@ public class MMDModelManager
 
     enum EntityState { Idle, Walk, Swim, Ridden }
 
-    static class Model
+    public static class Model
     {
         Entity entity;
         IMMDModel model;
@@ -192,11 +206,11 @@ public class MMDModelManager
 
     static class PlayerData
     {
-        enum EntityStateLayer0 { Idle, Walk, Sprint, Air, OnLadder, Swim, Ride, Sleep, ElytraFly, Die }
+        enum EntityStateLayer0 { Idle, Walk, Squat, Sneak, Sprint, Air, OnLadder, Swim, Ride, Sleep, ElytraFly, Die }
         EntityStateLayer0 stateLayer0;
         enum EntityStateLayer1 { Idle, SwingRight, SwingLeft, Item1Right, Item1Left, Item2Right, Item2Left, Item3Right, Item3Left, Item4Right, Item4Left } //Idle means no animation.
         EntityStateLayer1 stateLayer1;
-        enum EntityStateLayer2 { Idle, Sneak } //Idle means no animation.
+        enum EntityStateLayer2 { Idle, Squat, Sneak } //Idle means no animation.
         EntityStateLayer2 stateLayer2;
         boolean playCustomAnim; //Custom animation played in layer 0.
         long rightHandMat, leftHandMat;

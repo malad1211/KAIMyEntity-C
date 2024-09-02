@@ -1,5 +1,6 @@
 package com.kAIS.KAIMyEntity.renderer;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -25,28 +26,34 @@ public class KAIMyEntityRenderer<T extends Entity> extends Render<T>
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
 
         MMDModelManager.Model model = MMDModelManager.GetModelOrInPool(entity, modelName, false);
-
-        if (model != null)
-        {
-            if (entity.isBeingRidden())
-            {
-                AnimStateChangeOnce(model, MMDModelManager.EntityState.Ridden, "ridden");
-            }
-            else if (entity.isInWater())
-            {
-                AnimStateChangeOnce(model, MMDModelManager.EntityState.Swim, "swim");
-            }
-            else if (entity.posX - entity.prevPosX != 0.0f || entity.posZ - entity.prevPosZ != 0.0f)
-            {
-                AnimStateChangeOnce(model, MMDModelManager.EntityState.Walk, "walk");
-            }
-            else
-            {
-                AnimStateChangeOnce(model, MMDModelManager.EntityState.Idle, "idle");
-            }
-            model.unuseTime = 0;
-            model.model.Render(x, y, z, entityYaw);
+        if (model == null) {
+            return;
         }
+
+        if (Minecraft.getMinecraft().isGamePaused()) {
+            model.unuseTime = 0;
+            model.model.Render(entity, x, y, z, entityYaw);
+            return;
+        }
+
+        if (entity.isBeingRidden())
+        {
+            AnimStateChangeOnce(model, MMDModelManager.EntityState.Ridden, "ridden");
+        }
+        else if (entity.isInWater())
+        {
+            AnimStateChangeOnce(model, MMDModelManager.EntityState.Swim, "swim");
+        }
+        else if (entity.posX - entity.prevPosX != 0.0f || entity.posZ - entity.prevPosZ != 0.0f)
+        {
+            AnimStateChangeOnce(model, MMDModelManager.EntityState.Walk, "walk");
+        }
+        else
+        {
+            AnimStateChangeOnce(model, MMDModelManager.EntityState.Idle, "idle");
+        }
+        model.unuseTime = 0;
+        model.model.Render(entity, x, y, z, entityYaw);
     }
 
     public KAIMyEntityRenderer(RenderManager renderManager, String modelName)

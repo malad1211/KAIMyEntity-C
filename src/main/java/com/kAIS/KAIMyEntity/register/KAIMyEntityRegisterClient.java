@@ -7,6 +7,7 @@ import com.kAIS.KAIMyEntity.renderer.KAIMyEntityRendererPlayer;
 import com.kAIS.KAIMyEntity.renderer.MMDModelManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
@@ -72,10 +73,18 @@ public class KAIMyEntityRegisterClient
         {
             KAIMyEntityRendererPlayer.Init(event.getRenderer().getRenderManager());
         }
+
+        EntityPlayer entity = event.getEntityPlayer();
+        MMDModelManager.Model m = MMDModelManager.GetPlayerModelOrInPool(entity);
+        if (m == null) {
+            return;
+        }
+
         event.setCanceled(true);
 
-        float f = event.getEntity().prevRotationYaw + (event.getEntity().rotationYaw - event.getEntity().prevRotationYaw) * event.getPartialRenderTick();
-        KAIMyEntityRendererPlayer.GetInst().doRender(event.getEntityPlayer(), event.getX(), event.getY(), event.getZ(), f, event.getPartialRenderTick());
+        float partialRenderTick = event.getPartialRenderTick();
+        float f = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialRenderTick;
+        KAIMyEntityRendererPlayer.GetInst().doRender(entity, event.getX(), event.getY(), event.getZ(), f, partialRenderTick);
     }
 
     @SideOnly(Side.CLIENT)
