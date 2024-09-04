@@ -16,11 +16,20 @@ public class MMDModelManager
     {
         models = new HashMap<>();
         modelPool = new HashMap<>();
-        prevTime = System.currentTimeMillis();
+        loadModelAttemptTime = new HashMap<>();
+        prevDeleteTime = System.currentTimeMillis();
     }
 
     public static IMMDModel LoadModel(String modelName, long layerCount)
     {
+        Long now = System.currentTimeMillis();
+        Long lastAttemptTime = loadModelAttemptTime.get(modelName);
+        if (lastAttemptTime != null) {
+            if (now - lastAttemptTime < reloadModelInterval) return null;
+        }
+
+        loadModelAttemptTime.put(modelName, now);
+
         //Model path
         File modelDir = new File(Minecraft.getMinecraft().mcDataDir, "KAIMyEntity/" + modelName);
         String modelDirStr = modelDir.getAbsolutePath();
@@ -141,21 +150,24 @@ public class MMDModelManager
         }
     }
 
+    // apparently this is never called?
+    // TODO: check
     public static void Update()
     {
-        long deltaTime = System.currentTimeMillis() - prevTime;
+        long now = System.currentTimeMillis();
+        long deltaTime = now - prevDeleteTime;
 
         // we don't need this running n times per tick
         // for every entity rendered
-        if (deltaTime < 200) return;
+        if (deltaTime < unuseTimeThreshold) return;
 
-        prevTime = System.currentTimeMillis();
+        prevDeleteTime = now;
 
         List<Entity> waitForDelete = new LinkedList<>();
         for (Model i : models.values())
         {
             i.unuseTime += deltaTime;
-            if (i.unuseTime > 10000)
+            if (i.unuseTime > unuseTimeThreshold)
             {
                 TryModelToPool(i);
                 waitForDelete.add(i.entity);
@@ -219,7 +231,10 @@ public class MMDModelManager
 
     static Map<Entity, Model> models;
     static Map<String, Stack<IMMDModel>> modelPool;
-    static long prevTime;
+    static Map<String, Long> loadModelAttemptTime;
+    static long prevDeleteTime;
+    static final long unuseTimeThreshold = 10000;
+    static final long reloadModelInterval = 10000;
 
     static void DeleteModel(Model model)
     {
