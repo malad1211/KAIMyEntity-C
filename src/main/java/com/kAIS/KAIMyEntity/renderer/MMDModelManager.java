@@ -16,19 +16,14 @@ public class MMDModelManager
     {
         models = new HashMap<>();
         modelPool = new HashMap<>();
-        loadModelAttemptTime = new HashMap<>();
         prevDeleteTime = System.currentTimeMillis();
+        // TODO: placeholder way to avoid excessive file read
+        loadModelAttemptTime = new HashMap<>();
     }
 
     public static IMMDModel LoadModel(String modelName, long layerCount)
     {
-        Long now = System.currentTimeMillis();
-        Long lastAttemptTime = loadModelAttemptTime.get(modelName);
-        if (lastAttemptTime != null) {
-            if (now - lastAttemptTime < reloadModelInterval) return null;
-        }
-
-        loadModelAttemptTime.put(modelName, now);
+        if (!AllowModelReload(modelName)) return null;
 
         //Model path
         File modelDir = new File(Minecraft.getMinecraft().mcDataDir, "KAIMyEntity/" + modelName);
@@ -178,7 +173,7 @@ public class MMDModelManager
             models.remove(i);
     }
 
-    public static void ReloadModel()
+    public static void ClearModels()
     {
         for (Model i : models.values())
             DeleteModel(i);
@@ -194,6 +189,20 @@ public class MMDModelManager
             }
         }
         modelPool = new HashMap<>();
+    }
+
+    private static boolean AllowModelReload(String modelName) {
+        Long now = System.currentTimeMillis();
+        if (!loadModelAttemptTime.containsKey(modelName)) {
+            loadModelAttemptTime.put(modelName, now);
+            return true;
+        }
+
+        Long lastAttempt = loadModelAttemptTime.get(modelName);
+        if (now - lastAttempt < reloadModelInterval) return false;
+
+        loadModelAttemptTime.put(modelName, now);
+        return true;
     }
 
     enum EntityState { Idle, Walk, Swim, Ridden }
@@ -231,9 +240,9 @@ public class MMDModelManager
 
     static Map<Entity, Model> models;
     static Map<String, Stack<IMMDModel>> modelPool;
-    static Map<String, Long> loadModelAttemptTime;
     static long prevDeleteTime;
     static final long unuseTimeThreshold = 10000;
+    static Map<String, Long> loadModelAttemptTime;
     static final long reloadModelInterval = 10000;
 
     static void DeleteModel(Model model)

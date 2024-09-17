@@ -20,6 +20,8 @@ public class MMDTextureManager
     {
         nf = NativeFunc.GetInst();
         texs = new HashMap<>();
+        // TODO: placeholder way to avoid excessive file read
+        loadTextureAttemptTime = new HashMap<>();
     }
 
     public static Texture GetTexture(String filename)
@@ -27,6 +29,8 @@ public class MMDTextureManager
         Texture result = texs.get(filename);
         if (result == null)
         {
+            if (!AllowTextureReload(filename)) return null;
+
             long nfTex = nf.LoadTexture(filename);
             if (nfTex == 0)
                 return null;
@@ -80,6 +84,22 @@ public class MMDTextureManager
         texs = new HashMap<>();
     }
 
+    private static boolean AllowTextureReload(String filename) {
+        Long now = System.currentTimeMillis();
+        if (!loadTextureAttemptTime.containsKey(filename)) {
+            loadTextureAttemptTime.put(filename, now);
+            return true;
+        }
+
+        Long lastAttempt = loadTextureAttemptTime.get(filename);
+        if (now - lastAttempt < reloadTextureInterval) return false;
+
+        loadTextureAttemptTime.put(filename, now);
+        return true;
+    }
+
     static NativeFunc nf;
     static Map<String, Texture> texs;
+    static Map<String, Long> loadTextureAttemptTime;
+    static final long reloadTextureInterval = 10000;
 }

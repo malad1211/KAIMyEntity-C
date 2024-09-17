@@ -109,7 +109,7 @@ public class KAIMyEntityRegisterClient
         }
         if (keyReloadModels.isKeyDown())
         {
-            MMDModelManager.ReloadModel();
+            MMDModelManager.ClearModels();
         }
         if (keyCustomAnim1.isKeyDown())
         {
