@@ -6,6 +6,7 @@ import com.kAIS.KAIMyEntity.config.KAIMyEntityConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.entity.Entity;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
@@ -97,9 +98,11 @@ public class MMDModelOpenGL implements IMMDModel
         nf.DeleteModel(model.model);
     }
 
-    public void Render(double x, double y, double z, float entityYaw)
+    public void Render(Entity entityIn, double x, double y, double z, float entityYaw)
     {
-        Update();
+        if (!Minecraft.getMinecraft().isGamePaused()) {
+            Update();
+        }
         RenderModel(x, y, z, entityYaw);
     }
 
@@ -235,7 +238,7 @@ public class MMDModelOpenGL implements IMMDModel
                 Minecraft.getMinecraft().getRenderManager().renderEngine.bindTexture(TextureManager.RESOURCE_LOCATION_EMPTY);
             else
                 GlStateManager.bindTexture(mats[materialID].tex);
-            long startPos = nf.GetSubMeshBeginIndex(model, i) * indexElementSize;
+            long startPos = (long) nf.GetSubMeshBeginIndex(model, i) * indexElementSize;
             int count = nf.GetSubMeshVertexCount(model, i);
             GL11.glDrawElements(GL11.GL_TRIANGLES, count, indexType, startPos);
         }

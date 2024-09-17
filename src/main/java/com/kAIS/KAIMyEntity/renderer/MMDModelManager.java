@@ -4,6 +4,7 @@ import com.kAIS.KAIMyEntity.NativeFunc;
 import com.kAIS.KAIMyEntity.config.KAIMyEntityConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -15,13 +16,17 @@ public class MMDModelManager
     {
         models = new HashMap<>();
         modelPool = new HashMap<>();
-        prevTime = System.currentTimeMillis();
+        prevDeleteTime = System.currentTimeMillis();
+        // TODO: placeholder way to avoid excessive file read
+        loadModelAttemptTime = new HashMap<>();
     }
 
     public static IMMDModel LoadModel(String modelName, long layerCount)
     {
+        if (!AllowModelReload(modelName)) return null;
+
         //Model path
-        File modelDir = new File(Minecraft.getMinecraft().gameDir, "KAIMyEntity/" + modelName);
+        File modelDir = new File(Minecraft.getMinecraft().mcDataDir, "KAIMyEntity/" + modelName);
         String modelDirStr = modelDir.getAbsolutePath();
 
         String modelFilenameStr;
@@ -47,6 +52,14 @@ public class MMDModelManager
         }
 
         return MMDModelOpenGL.Create(modelFilenameStr, modelDirStr, isPMD, layerCount);
+    }
+
+    public static MMDModelManager.Model GetPlayerModelOrInPool(EntityPlayer entity) {
+        MMDModelManager.Model m = MMDModelManager.GetModelOrInPool(entity, "EntityPlayer_" + entity.getName(), true);
+        if (m == null) {
+            m = MMDModelManager.GetModelOrInPool(entity, "EntityPlayer", true);
+        }
+        return m;
     }
 
     public static MMDModelManager.Model GetModelOrInPool(Entity entity, String modelName, boolean isPlayer)
@@ -132,16 +145,24 @@ public class MMDModelManager
         }
     }
 
+    // apparently this is never called?
+    // TODO: check
     public static void Update()
     {
-        long deltaTime = System.currentTimeMillis() - prevTime;
-        prevTime = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
+        long deltaTime = now - prevDeleteTime;
+
+        // we don't need this running n times per tick
+        // for every entity rendered
+        if (deltaTime < unuseTimeThreshold) return;
+
+        prevDeleteTime = now;
 
         List<Entity> waitForDelete = new LinkedList<>();
         for (Model i : models.values())
         {
             i.unuseTime += deltaTime;
-            if (i.unuseTime > 10000)
+            if (i.unuseTime > unuseTimeThreshold)
             {
                 TryModelToPool(i);
                 waitForDelete.add(i.entity);
@@ -152,7 +173,7 @@ public class MMDModelManager
             models.remove(i);
     }
 
-    public static void ReloadModel()
+    public static void ClearModels()
     {
         for (Model i : models.values())
             DeleteModel(i);
@@ -170,9 +191,23 @@ public class MMDModelManager
         modelPool = new HashMap<>();
     }
 
+    private static boolean AllowModelReload(String modelName) {
+        Long now = System.currentTimeMillis();
+        if (!loadModelAttemptTime.containsKey(modelName)) {
+            loadModelAttemptTime.put(modelName, now);
+            return true;
+        }
+
+        Long lastAttempt = loadModelAttemptTime.get(modelName);
+        if (now - lastAttempt < reloadModelInterval) return false;
+
+        loadModelAttemptTime.put(modelName, now);
+        return true;
+    }
+
     enum EntityState { Idle, Walk, Swim, Ridden }
 
-    static class Model
+    public static class Model
     {
         Entity entity;
         IMMDModel model;
@@ -192,11 +227,11 @@ public class MMDModelManager
 
     static class PlayerData
     {
-        enum EntityStateLayer0 { Idle, Walk, Sprint, Air, OnLadder, Swim, Ride, Sleep, ElytraFly, Die }
+        enum EntityStateLayer0 { Idle, Walk, Squat, Sneak, Sprint, Air, OnLadder, Swim, Ride, Sleep, ElytraFly, Die }
         EntityStateLayer0 stateLayer0;
         enum EntityStateLayer1 { Idle, SwingRight, SwingLeft, Item1Right, Item1Left, Item2Right, Item2Left, Item3Right, Item3Left, Item4Right, Item4Left } //Idle means no animation.
         EntityStateLayer1 stateLayer1;
-        enum EntityStateLayer2 { Idle, Sneak } //Idle means no animation.
+        enum EntityStateLayer2 { Idle, Squat, Sneak } //Idle means no animation.
         EntityStateLayer2 stateLayer2;
         boolean playCustomAnim; //Custom animation played in layer 0.
         long rightHandMat, leftHandMat;
@@ -205,7 +240,10 @@ public class MMDModelManager
 
     static Map<Entity, Model> models;
     static Map<String, Stack<IMMDModel>> modelPool;
-    static long prevTime;
+    static long prevDeleteTime;
+    static final long unuseTimeThreshold = 10000;
+    static Map<String, Long> loadModelAttemptTime;
+    static final long reloadModelInterval = 10000;
 
     static void DeleteModel(Model model)
     {

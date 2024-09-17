@@ -14,6 +14,8 @@ public class MMDAnimManager
         nf = NativeFunc.GetInst();
         animStatic = new HashMap<>();
         animModel = new HashMap<>();
+        // TODO: placeholder way to avoid excessive file read
+        loadAnimAttemptTime = new HashMap<>();
     }
 
     //(Slash) For player (/Slash) Now player has multiple model. This function will be deleted.
@@ -23,10 +25,10 @@ public class MMDAnimManager
         Long result = animStatic.get(filename);
         if (result == null)
         {
-            long anim = nf.LoadAnimation(model.GetModelLong(), filename);
-            if (anim == 0)
-                return 0;
-            result = anim;
+            if (!AllowAnimReload(filename)) return 0;
+
+            result = nf.LoadAnimation(model.GetModelLong(), filename);
+            if (result == 0) return 0;
             animStatic.put(filename, result);
         }
         return result;
@@ -53,10 +55,10 @@ public class MMDAnimManager
         Long result = sub.get(filename);
         if (result == null)
         {
-            long anim = nf.LoadAnimation(model.GetModelLong(), filename);
-            if (anim == 0)
-                return 0;
-            result = anim;
+            if (!AllowAnimReload(filename)) return 0;
+
+            result = nf.LoadAnimation(model.GetModelLong(), filename);
+            if (result == 0) return 0;
             sub.put(filename, result);
         }
         return result;
@@ -68,9 +70,25 @@ public class MMDAnimManager
             nf.DeleteAnimation(i);
     }
 
+    private static boolean AllowAnimReload(String filename) {
+        Long now = System.currentTimeMillis();
+        if (!loadAnimAttemptTime.containsKey(filename)) {
+            loadAnimAttemptTime.put(filename, now);
+            return true;
+        }
+
+        Long lastAttempt = loadAnimAttemptTime.get(filename);
+        if (now - lastAttempt < reloadAnimInterval) return false;
+
+        loadAnimAttemptTime.put(filename, now);
+        return true;
+    }
+
     static NativeFunc nf;
     static Map<String, Long> animStatic;
     static Map<IMMDModel, Map<String, Long>> animModel;
+    static Map<String, Long> loadAnimAttemptTime;
+    static final long reloadAnimInterval = 10000;
 
     static String GetAnimationFilename(String modelDir, String animName)
     {
